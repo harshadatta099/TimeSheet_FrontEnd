@@ -144,7 +144,6 @@ const TimeEntryForm = () => {
         month: "2-digit",
         year: "2-digit",
       });
-      // const formattedDate=currentDay.toISOString();
       console.log(formattedDate);
       return days[i] + " " + formattedDate;
     });
