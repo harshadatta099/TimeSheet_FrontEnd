@@ -144,7 +144,7 @@ const TimeEntryForm = () => {
         month: "2-digit",
         year: "2-digit",
       });
-      console.log(formattedDate);
+      // console.log(formattedDate);
       return days[i] + " " + formattedDate;
     });
   };

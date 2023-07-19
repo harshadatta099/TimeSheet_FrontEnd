@@ -6,10 +6,10 @@ import axios from "axios";
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  // const [userType, setUserType] = useState("user"); // ["user", "admin ", "hr"]
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [showAlert, setShowAlert] = useState(false);
-  const [isSignup, setIsSignup] = useState(false); // Track if it's signup mode
+
 
   const navigate = useNavigate();
 
@@ -34,28 +34,29 @@ const LoginPage = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (validateForm()) {
-      try {
-        const response = await axios.post("http://localhost:5070/login", {
-          email,
-          password,
-        });
-
-        console.log("Logged in successfully");
-        console.log(response.data); // If the server returns any data
-       if(response.data.status==="success"){
-        navigate("/home");
-      }
-
-        setEmail("");
-        setPassword("");
-        setShowAlert(true);
-      } catch (error) {
-        console.error("Login failed", error);
-      }
+    const apiUrl = 'http://localhost:5070/login';
+    const data = {
+      email: email,
+      password: password,
+      userType : 0,
     }
+    e.preventDefault();
+    axios.post (apiUrl, data).then(
+      (response) => {
+        console.log(response.data);
+        if (response.data != null) {
+          localStorage.setItem('isLoggedIn', true);
+          localStorage.setItem('user', JSON.stringify(response.data));
+          navigate("/home", { replace: true });
+        } else {
+          alert("Invalid credentials");
+        }
+      }
+    )
+    if (!validateForm()) {
+      return;
+    }
+
   };
 
   return (
@@ -107,17 +108,7 @@ const LoginPage = () => {
             Login
           </Button>
         </Form>
-        {/* {showAlert && (
-          <Alert
-            variant="success"
-            onClose={() => setShowAlert(false)}
-            dismissible
-            style={{ minHeight: "30px", height: "60px", marginTop: "20px" }}
-
-          >
-            <p>login success!</p>
-          </Alert>
-        )} */}
+        
       </div>
     </div>
   );
