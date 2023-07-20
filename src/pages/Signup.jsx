@@ -61,7 +61,7 @@ const Signup = () => {
 
   return (
     <div className="container d-flex justify-content-center align-items-center vh-100">
-      <Card className="p-5  ">
+      <Card className="p-5">
         <h2 className="text-center mb-4">Signup</h2>
         <Form onSubmit={handleSubmit}>
           <Form.Group controlId="username">
