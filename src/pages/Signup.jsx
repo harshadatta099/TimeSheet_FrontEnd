@@ -9,7 +9,7 @@ const Signup = () => {
     email: "",
     password: "",
     mobileno: "",
-    userType: 0,
+    roleType: "User", // Set the default roleType to "User"
   });
 
   const [errors, setErrors] = useState({
@@ -18,7 +18,9 @@ const Signup = () => {
     password: "",
     mobileno: "",
   });
+
   const navigate = useNavigate();
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
@@ -116,6 +118,21 @@ const Signup = () => {
             {errors.mobileno && (
               <Alert variant="danger">{errors.mobileno}</Alert>
             )}
+          </Form.Group>
+
+          <Form.Group controlId="roleType">
+            <Form.Label>Role Type</Form.Label>
+            <Form.Control
+              as="select"
+              name="roleType"
+              value={formData.roleType}
+              onChange={handleChange}
+              required
+            >
+              <option value="Admin">Admin</option>
+              <option value="HR">HR</option>
+              <option value="User">User</option>
+            </Form.Control>
           </Form.Group>
 
           <Button className="mt-3 w-100" variant="primary" type="submit">

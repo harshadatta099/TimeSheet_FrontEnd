@@ -3,79 +3,140 @@ import { Form, Table, Button } from "react-bootstrap";
 import axios from "axios";
 
 const TimeEntryForm = () => {
-  
-  const convertToISODate = (inputDate) => {
-    const [month, day, year] = inputDate.split("/");
-    const formattedMonth = String(month).padStart(2, "0");
-    const formattedDay = String(day).padStart(2, "0");
-    return `${year}-${formattedMonth}-${formattedDay}`;
-  };
-  const currentDate = convertToISODate(new Date().toLocaleDateString("en-US"));
 
-  const currentDay = new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-  });
-  const [formData, setFormData] = useState({
+  
+  const [data, setData] = useState({
     id: 0,
-    projectName: "",
-    activity: "",
+    userName: "",
+    email: "",
     task: "",
     hours: 0,
-    dateOnly: currentDate,
+    createdDate: new Date().toISOString(),
+    activityname: "",
+    projectnameid: 0,
+    projectname: "",
+    activityid: 0,
   });
+
   const [entries, setEntries] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
+
+  const [selectedProjectId, setSelectedProjectId] = useState(0);
+  const [selectedActivityId, setSelectedActivityId] = useState(0);
+  
+  
+
+  const projects = [
+    "PersonaNutrition",
+    "Puritains",
+    "NestleHealthSciences",
+    "MarketCentral",
+    "FamilyCentral",
+    "InternalPOC",
+    "ExternalPOC",
+    "Marketing&Sales",
+  ];
+
+  const activities = [
+    "UnitTesting",
+    "AcceptanceTesting",
+    "Warranty/MC",
+    "SystemTesting",
+    "Coding/Implementation",
+    "Design",
+    "Support",
+    "IntegrationTesting",
+    "RequirementsDevelopment",
+    "Planning",
+    "PTO",
+  ];
+
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setFormData({ ...formData, [name]: value });
+    setData({ ...data, [name]: value });
   };
 
+  const handleProjectChange = (event) => {
+    const { value } = event.target;
+    setSelectedProjectId(parseInt(value, 10));
+    setData({ ...data, projectnameid: parseInt(value, 10) });
+  };
+
+  const handleActivityChange = (event) => {
+    const { value } = event.target;
+    setSelectedActivityId(parseInt(value, 10));
+    setData({ ...data, activityid: parseInt(value, 10) });
+  };
+  useEffect(() => {
+    // Fetch the username and email from localStorage on component mount
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const { userName, email } = JSON.parse(storedUser);
+      setData((prevData) => ({
+        ...prevData,
+        userName: userName,
+        email: email,
+      }));
+    }
+  }, []);
   const handleSubmit = async (event) => {
-    console.log(currentDate);
     event.preventDefault();
     try {
       if (isEditing) {
         // Edit existing entry
         const response = await axios.put(
-          `http://localhost:5070/Edit?id=${formData.id}`,
-          formData
+          `http://localhost:5070/EditTask?id=${data.id}`,
+          data
         );
         if (response.status === 200) {
           // Refresh the entries after successful edit
           await fetchEntries();
           // Reset the form after editing
-          setFormData({
+          setData({
             id: 0,
-            projectName: "",
-            activity: "",
+            userName: "",
+            email: "",
             task: "",
             hours: 0,
-            dateOnly: currentDate,
+            createdDate: new Date().toISOString(),
+            activityname: "",
+            projectnameid: 0,
+            projectname: "",
+            activityid: 0,
           });
           setIsEditing(false);
         } else {
           throw new Error("Failed to edit data.");
         }
       } else {
+        const selectedProject = projects[data.projectnameid];
+        const selectedActivity = activities[data.activityid];
+
         // Create new entry
-        debugger;
-        const response = await axios.post(
-          "http://localhost:5070/save",
-          formData
-        );
+        const newData = {
+          ...data,
+          projectname: selectedProject,
+          activityname: selectedActivity,
+        };
+
+        const response = await axios.post("http://localhost:5070/add", newData);
         if (response.status === 200) {
-          // Refresh the entries after successful save
-          console.log(response.data);
           await fetchEntries();
-          // Reset the form after saving
-          setFormData({
+
+          setData({
             id: 0,
-            projectName: "",
-            activity: "",
+            userName: "",
+            email: "",
             task: "",
             hours: 0,
-            dateOnly: currentDate,
+            createdDate: new Date().toISOString(),
+            activityname: "",
+            projectnameid: 0,
+            projectname: "",
+            activityid: 0,
           });
+          setSelectedProjectId(0);
+          setSelectedActivityId(0);
         } else {
           throw new Error("Failed to save data.");
         }
@@ -87,19 +148,25 @@ const TimeEntryForm = () => {
 
   const handleEditEntry = (entry) => {
     setIsEditing(true);
-    setFormData({
+    setData({
       id: entry.id,
-      projectName: entry.projectName,
-      activity: entry.activity,
+      userName: entry.userName,
+      email: entry.email,
       task: entry.task,
       hours: entry.hours,
-      dateOnly: entry.dateOnly.slice(0, 10),
+      createdDate: entry.createdDate,
+      activityname: entry.activityname,
+      projectnameid: entry.projectnameid,
+      projectname: entry.projectname,
+      activityid: entry.activityid,
     });
   };
 
-  const handleDelete = async (entryId) => {
+  const handleDelete = async (entryId, user) => {
     try {
-      const response = await axios.delete(`http://localhost:5070/${entryId}`);
+      const response = await axios.delete(
+        `http://localhost:5070/delete?id=${entryId}&user=${user}`
+      );
       if (response.status === 200) {
         // Refresh the entries after successful delete
         await fetchEntries();
@@ -114,7 +181,7 @@ const TimeEntryForm = () => {
   const fetchEntries = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5070/readdata?date=${currentDate}`
+        `http://localhost:5070/UserData?email=${data.email}`
       );
       if (response.status === 200) {
         setEntries(response.data);
@@ -127,9 +194,11 @@ const TimeEntryForm = () => {
   };
 
   useEffect(() => {
-    fetchEntries();
-    const intervalId = setInterval(fetchEntries, 1000);
-    return () => clearInterval(intervalId);
+    const timer = setTimeout(() => {
+      fetchEntries();
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -142,9 +211,8 @@ const TimeEntryForm = () => {
                 <th>Project Name</th>
                 <th>Activity</th>
                 <th>Task</th>
-                <th>
-                  {currentDate} {currentDay}
-                </th>
+                <th>Hours</th>
+                <th>Date</th>
               </tr>
             </thead>
             <tbody>
@@ -152,58 +220,40 @@ const TimeEntryForm = () => {
                 <td>
                   <Form.Control
                     as="select"
-                    name="projectName"
-                    value={formData.projectName}
-                    onChange={handleInputChange}
+                    name="projectnameid"
+                    value={selectedProjectId}
+                    onChange={handleProjectChange}
                     required
                   >
                     <option value="">Select Project</option>
-                    <option value="Persona Nutrition">Persona Nutrition</option>
-                    <option value="Nestle Health Sciences">
-                      Nestle Health Sciences
-                    </option>
-                    <option value="Market Central">Market Central</option>
-                    <option value="Family Central">Family Central</option>
-                    <option value="Internal POC">Internal POC</option>
-                    <option value="External POC">External POC</option>
-                    <option value="Marketing & Sales">Marketing & Sales</option>
+                    {projects.map((project, index) => (
+                      <option key={index} value={index}>
+                        {project}
+                      </option>
+                    ))}
                   </Form.Control>
                 </td>
                 <td>
                   <Form.Control
                     as="select"
-                    name="activity"
-                    value={formData.activity}
-                    onChange={handleInputChange}
+                    name="activityid"
+                    value={selectedActivityId}
+                    onChange={handleActivityChange}
                     required
                   >
                     <option value="">Select Activity</option>
-                    <option value="Unit Testing">Unit Testing</option>
-                    <option value="Acceptance Testing">
-                      Acceptance Testing
-                    </option>
-                    <option value="Warranty/MC">Warranty/MC</option>
-                    <option value="System Testing">System Testing</option>
-                    <option value="Coding/Implementation">
-                      Coding/Implementation
-                    </option>
-                    <option value="Design">Design</option>
-                    <option value="Support">Support</option>
-                    <option value="Integration Testing">
-                      Integration Testing
-                    </option>
-                    <option value="Requirements Development">
-                      Requirements Development
-                    </option>
-                    <option value="Planning">Planning</option>
-                    <option value="PTO">PTO</option>
+                    {activities.map((activity, index) => (
+                      <option key={index} value={index}>
+                        {activity}
+                      </option>
+                    ))}
                   </Form.Control>
                 </td>
                 <td>
                   <Form.Control
                     type="text"
                     name="task"
-                    value={formData.task}
+                    value={data.task}
                     onChange={handleInputChange}
                     placeholder="Enter Task"
                     required
@@ -213,9 +263,18 @@ const TimeEntryForm = () => {
                   <Form.Control
                     type="number"
                     name="hours"
-                    value={formData.hours}
+                    value={data.hours}
                     onChange={handleInputChange}
                     placeholder="Enter Number of Hours"
+                    required
+                  />
+                </td>
+                <td>
+                  <Form.Control
+                    type="date"
+                    name="createdDate"
+                    value={data.createdDate.slice(0, 10)}
+                    onChange={handleInputChange}
                     required
                   />
                 </td>
@@ -239,13 +298,13 @@ const TimeEntryForm = () => {
               </tr>
             </thead>
             <tbody>
-              {entries.map((entry) => (
-                <tr key={entry.id}>
-                  <td>{entry.projectName}</td>
-                  <td>{entry.activity}</td>
+              {entries.map((entry, index) => (
+                <tr key={index}>
+                  <td>{entry.projectname}</td>
+                  <td>{entry.activityname}</td>
                   <td>{entry.task}</td>
                   <td>{entry.hours}</td>
-                  <td>{entry.dateOnly.slice(0, 10)}</td>
+                  <td>{entry.createdDate.substring(0, 10)}</td>
                   <td>
                     <Button
                       variant="primary"
