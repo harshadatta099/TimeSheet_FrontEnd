@@ -1,7 +1,6 @@
 import React from "react";
 import Header from "../components/Header";
-import TimeTrackerApp from "../components/User/Users";
-import Users from "../components/User/Users";
+import Users from '../components/User/Users';
 const HomePage = () => {
   return (
     <div>
@@ -11,7 +10,8 @@ const HomePage = () => {
           <div className="col-12">
             <h1 className="text-center mt-2">TimeSheet </h1>
             <div className="mt-3">
-              <Users />
+              {/* <GetUsers /> */}
+              <Users/>
             </div>
           </div>
         </div>
