@@ -1,12 +1,14 @@
-import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import { ProtectedRoute, ProtectedSignupRoute, AuthGuard } from "./auth/auth";
+
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import Signup from "./pages/Signup";
-import { ProtectedRoute, ProtectedSignupRoute, AuthGuard } from "./auth/auth";
-import Admin from './components/Admin/Admin';
-import Hr from "./components/HR/Hr"
-
+import Admin from "./components/Admin/Admin";
+import Hr from "./components/HR/Hr";
+import WeekData from "./components/WeekData";
+import NotFound from "./pages/NotFound";
 
 const App = () => {
   return (
@@ -23,7 +25,8 @@ const App = () => {
         />
         <Route path="/admin/*" element={<Admin />} />
         <Route path="/hr/*" element={<Hr />} />
-        
+        <Route path="/weekdata" element={<WeekData />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

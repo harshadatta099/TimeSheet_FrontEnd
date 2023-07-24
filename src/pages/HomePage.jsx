@@ -1,6 +1,8 @@
 import React from "react";
 import Header from "../components/Header";
-import Users from '../components/User/Users';
+import AddTasks from '../components/User/AddTasks';
+import FetchData from '../components/User/FetchData';
+import WeekData from '../components/WeekData';
 const HomePage = () => {
   return (
     <div>
@@ -10,8 +12,12 @@ const HomePage = () => {
           <div className="col-12">
             <h1 className="text-center mt-2">TimeSheet </h1>
             <div className="mt-3">
-              {/* <GetUsers /> */}
-              <Users/>
+              
+            <br />
+              {/* <FetchData/> */}
+              <FetchData />
+              <br />
+              {/* <WeekData/> */}
             </div>
           </div>
         </div>

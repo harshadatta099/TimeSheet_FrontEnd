@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Table, Form, Button, Modal } from "react-bootstrap";
+import { Table, Form, Button, Modal, Row, Col } from "react-bootstrap";
 
 const GetAllUsers = () => {
   // Sample user records (temporary local data)
@@ -59,17 +59,21 @@ const GetAllUsers = () => {
 
   return (
     <div>
-      <Form className="mb-3">
-        <Form.Group controlId="formSearchEmail">
-          <Form.Label>Search by Email:</Form.Label>
-          <Form.Control
-            type="email"
-            placeholder="Enter email"
-            value={searchEmail}
-            onChange={handleSearchChange}
-          />
-        </Form.Group>
-      </Form>
+      <Row className="justify-content-center">
+          <Col lg={3}>
+            <Form className="mb-3">
+              <Form.Group controlId="formSearchEmail">
+                <Form.Label>Search by Email:</Form.Label>
+                <Form.Control
+                  type="email"
+                  placeholder="Enter email"
+                  value={searchEmail}
+                  onChange={handleSearchChange}
+                />
+              </Form.Group>
+            </Form>
+          </Col>
+        </Row>
 
       <Table striped bordered hover>
         <thead>

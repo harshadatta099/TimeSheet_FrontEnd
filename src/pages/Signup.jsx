@@ -9,7 +9,7 @@ const Signup = () => {
     email: "",
     password: "",
     mobileno: "",
-    roleType: "User", // Set the default roleType to "User"
+
   });
 
   const [errors, setErrors] = useState({
@@ -62,8 +62,11 @@ const Signup = () => {
   };
 
   return (
-    <div className="container d-flex justify-content-center align-items-center vh-100">
-      <Card className="p-5">
+    <div
+      className="container-fluid d-flex justify-content-center align-items-center vh-100"
+      style={{ backgroundColor: "#f2f2f2", minHeight: "100vh" }}
+    >
+      <Card style={{ width: "400px", padding: "20px" }}>
         <h2 className="text-center mb-4">Signup</h2>
         <Form onSubmit={handleSubmit}>
           <Form.Group controlId="username">
@@ -74,6 +77,7 @@ const Signup = () => {
               value={formData.username}
               onChange={handleChange}
               required
+              placeholder="Enter your username"
             />
             {errors.username && (
               <Alert variant="danger">{errors.username}</Alert>
@@ -88,6 +92,7 @@ const Signup = () => {
               value={formData.email}
               onChange={handleChange}
               required
+              placeholder="Enter your email"
             />
             {errors.email && <Alert variant="danger">{errors.email}</Alert>}
           </Form.Group>
@@ -100,6 +105,7 @@ const Signup = () => {
               value={formData.password}
               onChange={handleChange}
               required
+              placeholder="Enter your password"
             />
             {errors.password && (
               <Alert variant="danger">{errors.password}</Alert>
@@ -114,26 +120,14 @@ const Signup = () => {
               value={formData.mobileno}
               onChange={handleChange}
               required
+              placeholder="Enter your mobile number"
             />
             {errors.mobileno && (
               <Alert variant="danger">{errors.mobileno}</Alert>
             )}
           </Form.Group>
 
-          <Form.Group controlId="roleType">
-            <Form.Label>Role Type</Form.Label>
-            <Form.Control
-              as="select"
-              name="roleType"
-              value={formData.roleType}
-              onChange={handleChange}
-              required
-            >
-              <option value="Admin">Admin</option>
-              <option value="HR">HR</option>
-              <option value="User">User</option>
-            </Form.Control>
-          </Form.Group>
+        
 
           <Button className="mt-3 w-100" variant="primary" type="submit">
             Submit

@@ -8,6 +8,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [responseMessage, setResponseMessage] = useState("");
   const navigate = useNavigate();
 
   const validateForm = () => {
@@ -31,6 +32,9 @@ const LoginPage = () => {
   };
 
   const handleSubmit = async (e) => {
+    if (!validateForm()) {
+      return;
+    }
     const apiUrl = "http://localhost:5070/login";
     const data = {
       email: email,
@@ -38,56 +42,81 @@ const LoginPage = () => {
       userType: 0,
     };
     e.preventDefault();
-    axios.post(apiUrl, data).then((response) => {
-      console.log(response.data);
-      if (response.data != null) {
-        localStorage.setItem("isLoggedIn", true);
-        localStorage.setItem("user", JSON.stringify(response.data));
-        navigate("/home", { replace: true });
-      } else {
-        alert("Invalid credentials");
-      }
-    });
-    if (!validateForm()) {
-      return;
-    }
+    axios
+      .post(apiUrl, data)
+      .then((response) => {
+        // console.log(response.data);
+        if (response.data != null) {
+          localStorage.setItem("isLoggedIn", true);
+          localStorage.setItem("user", JSON.stringify(response.data));
+  
+          // Extract roleId and userId from the response and store them separately
+          const { roleId, userId } = response.data;
+          localStorage.setItem("roleId", roleId);
+          localStorage.setItem("userId", userId);
+          console.log(roleId, userId);
+          
+          navigate("/home", { replace: true });
+          setResponseMessage("Login successful");
+        }
+      })
+      .catch((error) => {
+        console.error("Login failed:", error);
+        setResponseMessage("Login failed");
+      });
   };
+  
 
   return (
-    <div className="container d-flex justify-content-center align-items-center vh-100">
-      <Card style={{ width: "18rem" }}>
-        <Card.Body>
-          <Card.Title>Login</Card.Title>
-          <Form onSubmit={handleSubmit}>
-            <Form.Group controlId="email">
-              <Form.Label>Email:</Form.Label>
-              <Form.Control
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                isInvalid={!!emailError}
-              />
-              <Form.Control.Feedback type="invalid">
-                {emailError}
-              </Form.Control.Feedback>
-            </Form.Group>
-            <Form.Group controlId="password" className="mt-2">
-              <Form.Label>Password:</Form.Label>
-              <Form.Control
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                isInvalid={!!passwordError}
-              />
-              <Form.Control.Feedback type="invalid">
-                {passwordError}
-              </Form.Control.Feedback>
-            </Form.Group>
-            <Button variant="primary" type="submit" className="mt-3 w-100">
-              Login
-            </Button>
-          </Form>
-        </Card.Body>
+    <div
+      className=" d-flex justify-content-center align-items-center vh-100"
+      style={{ backgroundColor: "#f2f2f2", minHeight: "100vh" }}
+    >
+      <Card style={{ width: "400px", padding: "20px" }}>
+        <Card.Title className="text-center mb-4">
+          <h3>Login</h3>
+        </Card.Title>
+        {responseMessage && (
+          <Alert
+            variant={
+              responseMessage === "Login successful" ? "success" : "danger"
+            }
+            className="text-center"
+          >
+            {responseMessage}
+          </Alert>
+        )}
+        <Form onSubmit={handleSubmit}>
+          <Form.Group controlId="email">
+            <Form.Label>Email:</Form.Label>
+            <Form.Control
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              isInvalid={!!emailError}
+              placeholder="Enter your email"
+            />
+            <Form.Control.Feedback type="invalid">
+              {emailError}
+            </Form.Control.Feedback>
+          </Form.Group>
+          <Form.Group controlId="password" className="mt-2">
+            <Form.Label>Password:</Form.Label>
+            <Form.Control
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              isInvalid={!!passwordError}
+              placeholder="Enter your password"
+            />
+            <Form.Control.Feedback type="invalid">
+              {passwordError}
+            </Form.Control.Feedback>
+          </Form.Group>
+          <Button variant="primary" type="submit" className="mt-3 w-100">
+            Login
+          </Button>
+        </Form>
       </Card>
     </div>
   );

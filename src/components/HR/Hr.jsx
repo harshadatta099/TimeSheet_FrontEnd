@@ -7,8 +7,8 @@ const Hr = () => {
   return (
     <div className="container mt-4">
       <Routes>
-        <Route path="/get-data" element={<GetUserData />} />
-        <Route path="get-users" element={<GetUsers />} />
+        <Route exact path="/data" element={<GetUserData />} />
+        <Route exact path="users" element={<GetUsers />} />
       </Routes>
     </div>
   );

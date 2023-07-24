@@ -7,8 +7,8 @@ const Admin = () => {
   return (
     <div className="container mt-4">
       <Routes>
-        <Route path="/" element={<GetAllData />} />
-        <Route path="get-all-users" element={<GetAllUsers />} />
+        <Route path="/data" element={<GetAllData />} />
+        <Route path="users" element={<GetAllUsers />} />
       </Routes>
     </div>
   );
