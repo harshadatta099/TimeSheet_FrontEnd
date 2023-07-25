@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Container, Table, Form, Button } from "react-bootstrap";
 import axios from "axios";
+import { fetchUserDataByUserId } from "../../services/API";
 const AddTasks = () => {
   const [projectNames, setProjectNames] = useState([]);
   const [activityNames, setActivityNames] = useState([]);
@@ -33,11 +34,11 @@ const AddTasks = () => {
       .then((response) => setProjectNames(response.data))
       .catch((error) => console.error('Error fetching project names:', error));
 
-    // Fetching activities
+    
     axios.get('http://localhost:5070/GetAllActivities')
       .then((response) => setActivityNames(response.data))
       .catch((error) => console.error('Error fetching activity names:', error));
-
+    
 
   }, []);
 
@@ -68,11 +69,11 @@ const AddTasks = () => {
       alert("User ID not found in localStorage. Please login again.");
       return;
     }
-
+   
     const data = {
       task: task,
       hours: dayDates[todayIndex],
-      createdDate: today.toISOString(),
+      createdDate: new Date().toISOString().slice(0, 10), // Convert to YYYY-MM-DD format
       projectId: parseInt(selectedProject),
       userId: parseInt(userId), // Convert userId to an integer
       activityId: parseInt(selectedActivity),
@@ -81,11 +82,12 @@ const AddTasks = () => {
     axios.post('http://localhost:5070/AddTask', data)
       .then((response) => {
         // Handle the response if needed
-        console.log("Task added successfully!");
+        console.log("Task added successfully!", response);
       })
       .catch((error) => {
         console.error('Error adding task:', error);
       });
+      fetchUserDataByUserId(userId);
 
     setSelectedProject("");
     setSelectedActivity("");

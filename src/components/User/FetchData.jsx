@@ -1,227 +1,120 @@
-import React, { useState } from "react";
-import { Table, Button, Modal, Form } from "react-bootstrap";
-import AddTasks from "./AddTasks"; 
-const FetchData = ({projectNames, activityNames}) => {
-  
- 
-  const initialUserRecords = [
+import React, { useEffect, useState } from "react";
+import { Container, Table, Form } from "react-bootstrap";
+import { fetchUserDataByUserId } from "../../services/API";
+
+const FetchData = () => {
+  const userId = localStorage.getItem("userId");
+  const [tasksData, setTasksData] = useState([
     {
-      timesheetId: 1,
-      task: "Task 1",
-      hours: 5,
-      createdDate: "2023-07-23",
-      projectId: 1,
-      userId: 101,
-      activityId: 201,
+      projectName: "",
+      activityName: "",
+      task: "",
+      hours: "",
+      createdDate: "",
     },
-    {
-      timesheetId: 2,
-      task: "Task 2",
-      hours: 3,
-      createdDate: "2023-07-22",
-      projectId: 2,
-      userId: 102,
-      activityId: 202,
-    },
-    
-  ];
-  const [userRecords, setUserRecords] = useState(initialUserRecords);
+  ]);
 
-  const [showModal, setShowModal] = useState(false);
-  const [editedTimesheet, setEditedTimesheet] = useState(null);
+  const today = new Date();
 
-  const handleEditClick = (timesheet) => {
-    setShowModal(true);
-    setEditedTimesheet(timesheet);
+  const generateWeekDates = () => {
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    const weekStart = new Date(today);
+
+    // Skip Sunday (dayOfWeek = 0) by adding 1 to the start day
+    weekStart.setDate(today.getDate() - dayOfWeek + 1);
+
+    const dates = [...Array(6)].map((_, i) => {
+      const date = new Date(weekStart);
+      date.setDate(weekStart.getDate() + i);
+      return date;
+    });
+
+    return dates;
+  };
+  const calculateTotalHours = (date) => {
+    const totalHours = tasksData.reduce((sum, taskData) => {
+      const taskCreatedDate = new Date(taskData.createdDate);
+      if (date.toDateString() === taskCreatedDate.toDateString()) {
+        return sum + parseFloat(taskData.hours);
+      }
+      return sum;
+    }, 0);
+    return totalHours;
   };
 
-  const handleDeleteClick = (timesheetId) => {
-    const updatedRecords = userRecords.filter(
-      (record) => record.timesheetId !== timesheetId
-    );
-    setUserRecords(updatedRecords);
+  useEffect(() => {
+    fetchUserDataByUserId(userId)
+      .then((data) => {
+        setTasksData(data);
+
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        
+      });
+  }, []);
+
+  const formatDate = (date) => {
+    const options = {
+      day: "2-digit",
+      month: "2-digit",
+      year: "2-digit",
+      weekday: "long",
+    };
+    return date.toLocaleDateString(undefined, options);
   };
 
-  const addTask = (newTask) => {
-    const newRecords = [...userRecords, newTask];
-    setUserRecords(newRecords);
-  };
-
-  const handleSaveChanges = () => {
-    const editedIndex = userRecords.findIndex(
-      (record) => record.timesheetId === editedTimesheet.timesheetId
-    );
-
-    if (editedIndex !== -1) {
-      const updatedRecords = [...userRecords];
-      updatedRecords[editedIndex] = editedTimesheet;
-      setUserRecords(updatedRecords);
-    }
-
-    setShowModal(false);
-  };
+  const weekDates = generateWeekDates();
 
   
 
   return (
-    <div>
-        <AddTasks addTask={addTask} />
-        <br />
-      <Table  bordered hover>
+    <Container>
+      <Table bordered>
         <thead>
           <tr>
-            <th>Timesheet ID</th>
+            <th>Project Name</th>
+            <th>Activity</th>
             <th>Task</th>
-            <th>Hours</th>
-            <th>Created Date</th>
-            <th>Project ID</th>
-            <th>User ID</th>
-            <th>Activity ID</th>
-            <th>Edit</th>
-            <th>Delete</th>
+            {weekDates.map((date, index) => (
+              <th key={index}>
+                {formatDate(date)}
+                {date.toDateString() === today.toDateString() && (
+                  <span> (Today)</span>
+                )}
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody>
-          {userRecords.map((record) => (
-            <tr key={record.timesheetId}>
-              <td>{record.timesheetId}</td>
-              <td>{record.task}</td>
-              <td>{record.hours}</td>
-              <td>{record.createdDate}</td>
-              <td>{record.projectId}</td>
-              <td>{record.userId}</td>
-              <td>{record.activityId}</td>
-              <td>
-                <Button
-                  variant="primary"
-                  className="w-100"
-                  onClick={() => handleEditClick(record)}
-                >
-                  Edit
-                </Button>
-              </td>
-              <td>
-                <Button
-                  variant="danger"
-                  className="w-100"
-                  onClick={() => handleDeleteClick(record.timesheetId)}
-                >
-                  Delete
-                </Button>
-              </td>
+          {  tasksData.map((taskData, index) => (
+            <tr key={index}>
+              <td>{taskData.projectName}</td>
+              <td>{taskData.activityName}</td>
+              <td>{taskData.task}</td>
+              {weekDates.map((date, index) => {
+                const taskCreatedDate = new Date(taskData.createdDate);
+                return (
+                  <td key={index}>
+                    {date.toDateString() === taskCreatedDate.toDateString() && (
+                      <span>{taskData.hours}</span>
+                    )}
+                  </td>
+                );
+              })}
             </tr>
           ))}
+          <tr>
+            <td colSpan={3}>Total Hours</td>
+            {weekDates.map((date, index) => (
+              <td key={index}>{calculateTotalHours(date)}</td>
+            ))}
+          </tr>
         </tbody>
+        
       </Table>
-
-      {/* Modal for editing timesheet */}
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Edit Timesheet</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {editedTimesheet && (
-            <Form>
-              <Form.Group controlId="formTimesheetId">
-                <Form.Label>Timesheet ID</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={editedTimesheet.timesheetId}
-                  readOnly
-                />
-              </Form.Group>
-              <Form.Group controlId="formTask">
-                <Form.Label>Task</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={editedTimesheet.task}
-                  onChange={(e) =>
-                    setEditedTimesheet({
-                      ...editedTimesheet,
-                      task: e.target.value,
-                    })
-                  }
-                />
-              </Form.Group>
-              <Form.Group controlId="formHours">
-                <Form.Label>Hours</Form.Label>
-                <Form.Control
-                  type="number"
-                  value={editedTimesheet.hours}
-                  onChange={(e) =>
-                    setEditedTimesheet({
-                      ...editedTimesheet,
-                      hours: e.target.value,
-                    })
-                  }
-                />
-              </Form.Group>
-              <Form.Group controlId="formCreatedDate">
-                <Form.Label>Created Date</Form.Label>
-                <Form.Control
-                  type="date"
-                  value={editedTimesheet.createdDate}
-                  onChange={(e) =>
-                    setEditedTimesheet({
-                      ...editedTimesheet,
-                      createdDate: e.target.value,
-                    })
-                  }
-                />
-              </Form.Group>
-              <Form.Group controlId="formProjectId">
-                <Form.Label>Project ID</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={editedTimesheet.projectId}
-                  onChange={(e) =>
-                    setEditedTimesheet({
-                      ...editedTimesheet,
-                      projectId: e.target.value,
-                    })
-                  }
-                />
-              </Form.Group>
-              <Form.Group controlId="formUserId">
-                <Form.Label>User ID</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={editedTimesheet.userId}
-                  onChange={(e) =>
-                    setEditedTimesheet({
-                      ...editedTimesheet,
-                      userId: e.target.value,
-                    })
-                  }
-                />
-              </Form.Group>
-              <Form.Group controlId="formActivityId">
-                <Form.Label>Activity ID</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={editedTimesheet.activityId}
-                  onChange={(e) =>
-                    setEditedTimesheet({
-                      ...editedTimesheet,
-                      activityId: e.target.value,
-                    })
-                  }
-                />
-              </Form.Group>
-            </Form>
-          )}
-        </Modal.Body>
-       <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Cancel
-          </Button>
-          <Button variant="primary" onClick={handleSaveChanges}>
-            Save Changes
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    
-    </div>
+    </Container>
   );
 };
 
