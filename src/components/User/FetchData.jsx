@@ -4,6 +4,14 @@ import { fetchUserDataByUserId } from "../../services/API";
 
 const FetchData = () => {
   const userId = localStorage.getItem("userId");
+
+  const [formData, setFormData] = useState({
+    projectName: "",
+    activityName: "",
+    task: "",
+    hours: "",
+  });
+  
   const [tasksData, setTasksData] = useState([
     {
       projectName: "",
@@ -53,7 +61,7 @@ const FetchData = () => {
         console.error("Error fetching data:", error);
         
       });
-  }, []);
+  }, [userId]);
 
   const formatDate = (date) => {
     const options = {
@@ -71,7 +79,11 @@ const FetchData = () => {
 
   return (
     <Container>
-      <Table bordered>
+      {
+        tasksData.length===0 ? (
+          <h1 className="text-center">No Data Found</h1>
+        ):(
+          <Table bordered>
         <thead>
           <tr>
             <th>Project Name</th>
@@ -114,6 +126,8 @@ const FetchData = () => {
         </tbody>
         
       </Table>
+        )
+      }
     </Container>
   );
 };
