@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Container, Table, Form, Button } from "react-bootstrap";
-import axios from "axios";
-import { fetchUserDataByUserId } from "../../services/API";
+import axios from 'axios';
+import { fetchUserDataByUserId, fetchAllProjects, fetchAllActivities } from "../../services/API";
 const AddTasks = () => {
   const [projectNames, setProjectNames] = useState([]);
   const [activityNames, setActivityNames] = useState([]);
@@ -29,17 +29,8 @@ const AddTasks = () => {
     return dates;
   };
   useEffect(() => {
-    
-    axios.get('http://localhost:5070/GetAllProjects')
-      .then((response) => setProjectNames(response.data))
-      .catch((error) => console.error('Error fetching project names:', error));
-
-    
-    axios.get('http://localhost:5070/GetAllActivities')
-      .then((response) => setActivityNames(response.data))
-      .catch((error) => console.error('Error fetching activity names:', error));
-    
-
+    fetchAllProjects().then((data) => setProjectNames(data));
+    fetchAllActivities().then((data) => setActivityNames(data));
   }, []);
 
   const formatDate = (date) => {
