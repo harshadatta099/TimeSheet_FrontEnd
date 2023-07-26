@@ -56,7 +56,20 @@ const LoginPage = () => {
           localStorage.setItem("userId", userId);
           console.log(roleId, userId);
           
-          navigate("/home", { replace: true });
+          switch (roleId) {
+            case 1:
+              navigate("/user", { replace: true });
+              break;
+            case 2:
+              navigate("/hr/users", { replace: true });
+              break;
+            case 3:
+              navigate("/admin/users", { replace: true });
+              break;
+            default:
+              console.error("Invalid roleId:", roleId);
+              setResponseMessage("Invalid roleId");
+          }
           setResponseMessage("Login successful");
         }
       })

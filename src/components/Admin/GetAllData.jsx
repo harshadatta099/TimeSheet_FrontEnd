@@ -1,116 +1,92 @@
-import React, { useState } from "react";
-import { Table, Form, Button, Modal } from "react-bootstrap";
-
+import React, { useState, useEffect } from "react";
+import { Table, Form, Container } from "react-bootstrap";
+import axios from "axios";
+import { Button } from "react-bootstrap";
 const GetAllData = () => {
-  // Sample user records (temporary local data)
-  const initialUserRecords = [
-    {
-      timesheetId: 1,
-      task: "Task 1",
-      hours: 5,
-      createdDate: "2023-07-23",
-      projectId: 1,
-      userId: 101,
-      activityId: 201,
-    },
-    {
-      timesheetId: 2,
-      task: "Task 2",
-      hours: 3,
-      createdDate: "2023-07-22",
-      projectId: 2,
-      userId: 102,
-      activityId: 202,
-    },
-    // Add more sample records as needed
-  ];
+  const [searchQuery, setSearchQuery] = useState("");
+  const [usersData, setUsersData] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState("");
 
-  const [userRecords, setUserRecords] = useState(initialUserRecords);
-  const [searchUserId, setSearchUserId] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [editedTimesheet, setEditedTimesheet] = useState(null);
+  useEffect(() => {
+    axios
+      .get("http://localhost:5070/api/Hr/GetAllUsers")
+      .then((response) => {
+        setUsersData(response.data);
+        setFilteredUsers(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, []);
+  
+  const handleDeleteUser = (userId) => {
+    axios
+      .delete(`http://localhost:5070/DeleteUserByUserId?userid=${userId}`)
+      .then((response) => {
+        setUsersData((prevUsers) =>
+          prevUsers.filter((user) => user.userId !== userId)
+        );
+        setFilteredUsers((prevFilteredUsers) =>
+          prevFilteredUsers.filter((user) => user.userId !== userId)
+        );
+      })
+      .catch((error) => {
+        console.error("Error deleting user:", error);
+      });
+  };
 
-  // Function to handle search input change
   const handleSearchChange = (e) => {
-    setSearchUserId(e.target.value);
-  };
+    const { value } = e.target;
+    setSearchQuery(value);
 
-  // Function to filter user records based on userId
-  const filterUserRecords = () => {
-    if (searchUserId === "") {
-      return userRecords; // No filter, return all records
-    }
-    return userRecords.filter((record) =>
-      record.userId.toString().includes(searchUserId)
+    const filtered = usersData.filter((user) =>
+      user.username.toLowerCase().includes(value.toLowerCase())
     );
+    setFilteredUsers(filtered);
   };
 
-  // Function to handle edit button click
-  const handleEditClick = (timesheet) => {
-    setShowModal(true);
-    setEditedTimesheet(timesheet);
+  const handleUserRowClick = (userId) => {
+    setSelectedUserId(userId);
   };
-
-  // Function to handle delete button click
-  const handleDeleteClick = (timesheetId) => {
-    const updatedRecords = userRecords.filter(
-      (record) => record.timesheetId !== timesheetId
-    );
-    setUserRecords(updatedRecords);
-  };
-
-  const filteredUserRecords = filterUserRecords();
 
   return (
-    <div>
-      <Form className="mb-3">
-        <Form.Group controlId="formSearchUserId">
-          <Form.Label>Search by User ID:</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Enter User ID"
-            value={searchUserId}
-            onChange={handleSearchChange}
-          />
-        </Form.Group>
+    <Container>
+      <Form className="my-3">
+        <Form.Label>
+          <div className="fs-5">USER DATA:</div>
+        </Form.Label>
+        <Form.Control
+          type="text"
+          placeholder="Search by username..."
+          value={searchQuery}
+          onChange={handleSearchChange}
+        />
       </Form>
-
       <Table striped bordered hover>
         <thead>
           <tr>
-            <th>Timesheet ID</th>
-            <th>Task</th>
-            <th>Hours</th>
-            <th>Created Date</th>
-            <th>Project ID</th>
             <th>User ID</th>
-            <th>Activity ID</th>
-            <th>Edit</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Mobile No</th>
             <th>Delete</th>
           </tr>
         </thead>
         <tbody>
-          {filteredUserRecords.map((record) => (
-            <tr key={record.timesheetId}>
-              <td>{record.timesheetId}</td>
-              <td>{record.task}</td>
-              <td>{record.hours}</td>
-              <td>{record.createdDate}</td>
-              <td>{record.projectId}</td>
-              <td>{record.userId}</td>
-              <td>{record.activityId}</td>
-              <td>
-                <Button
-                  variant="primary"
-                  onClick={() => handleEditClick(record)}
-                >
-                  Edit
-                </Button>
-              </td>
+          {filteredUsers.map((user) => (
+            <tr
+              key={user.userId}
+              onClick={() => handleUserRowClick(user.userId)}
+            >
+              <td>{user.userId}</td>
+              <td>{user.username}</td>
+              <td>{user.email}</td>
+              <td>{user.mobileno}</td>
               <td>
                 <Button
                   variant="danger"
-                  onClick={() => handleDeleteClick(record.timesheetId)}
+                  onClick={() => handleDeleteUser(user.userId)}
                 >
                   Delete
                 </Button>
@@ -119,114 +95,7 @@ const GetAllData = () => {
           ))}
         </tbody>
       </Table>
-
-      {/* Modal for editing timesheet */}
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Edit Timesheet</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {editedTimesheet && (
-            <Form>
-              <Form.Group controlId="formTimesheetId">
-                <Form.Label>Timesheet ID</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={editedTimesheet.timesheetId}
-                  readOnly
-                />
-              </Form.Group>
-              <Form.Group controlId="formTask">
-                <Form.Label>Task</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={editedTimesheet.task}
-                  onChange={(e) =>
-                    setEditedTimesheet({
-                      ...editedTimesheet,
-                      task: e.target.value,
-                    })
-                  }
-                />
-              </Form.Group>
-              <Form.Group controlId="formHours">
-                <Form.Label>Hours</Form.Label>
-                <Form.Control
-                  type="number"
-                  value={editedTimesheet.hours}
-                  onChange={(e) =>
-                    setEditedTimesheet({
-                      ...editedTimesheet,
-                      hours: e.target.value,
-                    })
-                  }
-                />
-              </Form.Group>
-              <Form.Group controlId="formCreatedDate">
-                <Form.Label>Created Date</Form.Label>
-                <Form.Control
-                  type="date"
-                  value={editedTimesheet.createdDate}
-                  onChange={(e) =>
-                    setEditedTimesheet({
-                      ...editedTimesheet,
-                      createdDate: e.target.value,
-                    })
-                  }
-                />
-              </Form.Group>
-              <Form.Group controlId="formProjectId">
-                <Form.Label>Project ID</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={editedTimesheet.projectId}
-                  onChange={(e) =>
-                    setEditedTimesheet({
-                      ...editedTimesheet,
-                      projectId: e.target.value,
-                    })
-                  }
-                />
-              </Form.Group>
-              <Form.Group controlId="formUserId">
-                <Form.Label>User ID</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={editedTimesheet.userId}
-                  onChange={(e) =>
-                    setEditedTimesheet({
-                      ...editedTimesheet,
-                      userId: e.target.value,
-                    })
-                  }
-                />
-              </Form.Group>
-              <Form.Group controlId="formActivityId">
-                <Form.Label>Activity ID</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={editedTimesheet.activityId}
-                  onChange={(e) =>
-                    setEditedTimesheet({
-                      ...editedTimesheet,
-                      activityId: e.target.value,
-                    })
-                  }
-                />
-              </Form.Group>
-            </Form>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Cancel
-          </Button>
-          <Button variant="primary" onClick={() => setShowModal(false)}>
-            Save Changes
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </div>
+    </Container>
   );
 };
 

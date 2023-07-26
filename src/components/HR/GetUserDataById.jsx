@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Container, Table, Form } from "react-bootstrap";
 import { fetchUserDataByUserId } from "../../services/API";
 
-const FetchData = () => {
-  const userId = localStorage.getItem("userId");
+const GetUserDataById = ({userId}) => {
+
   
   const [tasksData, setTasksData] = useState([
     {
@@ -125,4 +125,4 @@ const FetchData = () => {
   );
 };
 
-export default FetchData;
+export default GetUserDataById;

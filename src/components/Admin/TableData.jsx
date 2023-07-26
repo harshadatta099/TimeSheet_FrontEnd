@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Container, Table, Button, Modal, Form } from "react-bootstrap";
 import { fetchUserDataByUserId, editTaskByTimesheetId, deleteTimesheetByTimesheetId, fetchAllActivities,fetchAllProjects } from "../../services/API";
 
-const EditDeleteData = () => {
-  const userId = localStorage.getItem("userId");
+const TableData = ({userId}) => {
+
   const [tasksData, setTasksData] = useState([
     {
       timeSheetId: null,
@@ -270,4 +270,4 @@ const EditDeleteData = () => {
   );
 };
 
-export default EditDeleteData;
+export default TableData;

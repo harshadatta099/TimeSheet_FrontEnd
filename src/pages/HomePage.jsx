@@ -8,7 +8,7 @@ import EditDeleteData from '../components/User/EditDeleteData';
 const HomePage = () => {
   return (
     <div>
-      <Header />
+     
       <div className="container">
         <div className="row">
           <div className="col-12">

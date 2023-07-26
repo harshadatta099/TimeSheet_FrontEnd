@@ -49,7 +49,7 @@ const WeekData = () => {
   // Function to filter user records based on the selected date range
   const filterUserRecordsByDateRange = () => {
     if (!startDate || !endDate) {
-      return userRecords; // If either start date or end date is not selected, return all records
+      return userRecords; 
     }
 
     return userRecords.filter(

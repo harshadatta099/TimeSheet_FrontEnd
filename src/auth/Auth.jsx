@@ -15,7 +15,7 @@ export const ProtectedRoute = ({ element }) => {
 
 export const ProtectedSignupRoute = ({ element }) => {
   if (isAuthenticated()) {
-    return <Navigate to="/home" />;
+    return <Navigate to="/user" />;
   }
 
   return element;
@@ -24,5 +24,5 @@ export const ProtectedSignupRoute = ({ element }) => {
 export const AuthGuard = ({ element }) => {
   const isLoggedIn = JSON.parse(localStorage.getItem('isLoggedIn'));
 
-  return isLoggedIn ? <Navigate to="/home" /> : element;
+  return isLoggedIn ? <Navigate to="/user" /> : element;
 };

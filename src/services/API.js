@@ -12,6 +12,7 @@ const endpoints = {
   getAllTimesheetsbyId: (userId) => `${BASE_URL}/api/Hr/GetTimeSheetsByUserId?userid=${userId}`,
   getAllProjects: () => `${BASE_URL}/GetAllProjects`,
   getAllActivities: () => `${BASE_URL}/GetAllActivities`,
+
 };
 
 const fetchData = async (url, method, data = null) => {
@@ -72,3 +73,4 @@ export const fetchAllActivities = async () => {
   const url = endpoints.getAllActivities();
   return fetchData(url);
 };
+
