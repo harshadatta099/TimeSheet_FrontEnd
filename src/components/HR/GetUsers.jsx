@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Table, Form, Container } from "react-bootstrap";
 import axios from "axios";
-import GetUserDataById from "./GetUserDataById"; // Import the GetUserDataById component
+import {useNavigate  } from "react-router-dom";
 
 const GetUsers = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [usersData, setUsersData] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [selectedUserId, setSelectedUserId] = useState(""); // State to store the selected userId
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
-      .get("http://localhost:5070/api/Hr/GetAllUsers")
+      .get("http://localhost:5070/Hr/GetAllUsers")
       .then((response) => {
         setUsersData(response.data); 
         setFilteredUsers(response.data);
@@ -32,7 +32,7 @@ const GetUsers = () => {
   };
 
   const handleUserRowClick = (userId) => {
-    setSelectedUserId(userId); // Set the selected userId when a user row is clicked
+    navigate(`/user-details?userId=${userId}`);
   };
 
   return (
@@ -68,8 +68,8 @@ const GetUsers = () => {
         ))}
       </tbody>
     </Table>
-    {selectedUserId && <div className="fs-5 mb-3">USER DETAILS:</div>}
-    {selectedUserId && <GetUserDataById userId={selectedUserId} />}
+    
+   
   </Container>
   );
 };

@@ -12,6 +12,7 @@ import TableData from "./components/Admin/TableData";
 import GetUsers from "./components/HR/GetUsers";	
 import Header from "./components/Header";
 import EditDeleteData from "./components/User/EditDeleteData";
+import GetUserDataById from "./components/HR/GetUserDataById";
 const currentUserType  = parseInt(localStorage.getItem('roleId'));
 console.log( typeof currentUserType );
 const App = () => {
@@ -39,7 +40,7 @@ function AppRoutes(){
         <Route path="/user" element={<UserRoute currentUserType={currentUserType}>
           <HomePage />
            </UserRoute> }/>
-        <Route path="/user/edit-delete" element={<UserRoute currentUserType={currentUserType}>
+        <Route path="/user/edit" element={<UserRoute currentUserType={currentUserType}>
           <EditDeleteData />
            </UserRoute> }/>
         
@@ -56,6 +57,11 @@ function AppRoutes(){
         <Route path="/hr/users" element={
           <HrRoute currentUserType={currentUserType}>
             <GetUsers/>
+            </HrRoute>
+        } />
+        <Route path="/user-details" element={
+          <HrRoute currentUserType={currentUserType}>
+            <GetUserDataById/>
             </HrRoute>
         } />
        
@@ -82,3 +88,27 @@ function AdminRoute({children, currentUserType}){
     return <>{children}</>
   }
 }
+
+
+// import React from 'react'
+// import GetAllData from './components/Admin/GetAllData'
+// import { BrowserRouter, Routes, Route } from "react-router-dom";
+// import TableData from './components/Admin/TableData';
+// import Project from './components/Admin/Project';
+// import Activites from './components/Admin/Activity';
+// const App = () => {
+//   return (
+//     <div>
+//       <BrowserRouter>
+//         <Routes>
+//           <Route path="/" element={<GetAllData />} />
+//           <Route path="/projects" element={<Project />} />
+//           <Route path="/activities" element={<Activites />} />
+//           <Route path="/user-details" element={<TableData />} />
+//         </Routes>
+//       </BrowserRouter>
+//     </div>
+//   )
+// }
+
+// export default App

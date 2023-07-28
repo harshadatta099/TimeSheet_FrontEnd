@@ -42,7 +42,7 @@ const Signup = () => {
     // Check if there are any errors
     if (Object.values(newErrors).every((error) => error === "")) {
       // No errors, submit the form
-      const apiURL = "http://localhost:5070/signup";
+      const apiURL = "http://localhost:5070/Auth/signup";
 
       axios
         .post(apiURL, formData)
@@ -51,7 +51,7 @@ const Signup = () => {
           console.log("Signup successful:", response.data);
           if (response.data != null) {
             alert("Signup successful");
-            navigate("/home", { replace: true });
+            navigate("/", { replace: true });
           }
         })
         .catch((error) => {

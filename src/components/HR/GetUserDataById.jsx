@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Container, Table, Form } from "react-bootstrap";
 import { fetchUserDataByUserId } from "../../services/API";
-
-const GetUserDataById = ({userId}) => {
+import { useLocation } from "react-router-dom";
+const GetUserDataById = () => {
 
   
   const [tasksData, setTasksData] = useState([
@@ -14,6 +14,10 @@ const GetUserDataById = ({userId}) => {
       createdDate: "",
     },
   ]);
+  
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const userId = searchParams.get("userId");
 
   const today = new Date();
 

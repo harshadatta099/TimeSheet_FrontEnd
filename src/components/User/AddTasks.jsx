@@ -70,7 +70,7 @@ const AddTasks = () => {
       activityId: parseInt(selectedActivity),
     };
 
-    axios.post('http://localhost:5070/AddTask', data)
+    axios.post('http://localhost:5070/NewUser/addTask', data)
       .then((response) => {
         // Handle the response if needed
         console.log("Task added successfully!", response);

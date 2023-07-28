@@ -2,15 +2,16 @@ import React, { useState, useEffect } from "react";
 import { Table, Form, Container } from "react-bootstrap";
 import axios from "axios";
 import { Button } from "react-bootstrap";
+import {useNavigate} from "react-router-dom";
 const GetAllData = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [usersData, setUsersData] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState("");
-
+  const navigate = useNavigate();
   useEffect(() => {
     axios
-      .get("http://localhost:5070/api/Hr/GetAllUsers")
+      .get("http://localhost:5070/Hr/GetAllUsers")
       .then((response) => {
         setUsersData(response.data);
         setFilteredUsers(response.data);
@@ -22,7 +23,7 @@ const GetAllData = () => {
   
   const handleDeleteUser = (userId) => {
     axios
-      .delete(`http://localhost:5070/DeleteUserByUserId?userid=${userId}`)
+      .delete(`http://localhost:5070/Admin/deleteUserByUserId?userid=${userId}`)
       .then((response) => {
         setUsersData((prevUsers) =>
           prevUsers.filter((user) => user.userId !== userId)
@@ -47,7 +48,9 @@ const GetAllData = () => {
   };
 
   const handleUserRowClick = (userId) => {
+    navigate(`/user-details?userId=${userId}`);
     setSelectedUserId(userId);
+    console.log("selectedUserId", selectedUserId);
   };
 
   return (

@@ -35,7 +35,7 @@ const LoginPage = () => {
     if (!validateForm()) {
       return;
     }
-    const apiUrl = "http://localhost:5070/login";
+    const apiUrl = "http://localhost:5070/Auth/login";
     const data = {
       email: email,
       password: password,
@@ -54,9 +54,9 @@ const LoginPage = () => {
           const { roleId, userId } = response.data;
           localStorage.setItem("roleId", roleId);
           localStorage.setItem("userId", userId);
-          console.log(roleId, userId);
+          console.log("roleId",roleId,"userId", userId);
           
-          switch (roleId) {
+          switch (2) {
             case 1:
               navigate("/user", { replace: true });
               break;

@@ -7,7 +7,7 @@ const Hr = () => {
   return (
     <div className="container mt-4">
       <Routes>
-        <Route exact path="/data" element={<GetUserData />} />
+        <Route exact path="data" element={<GetUserData />} />
         <Route exact path="users" element={<GetUsers />} />
       </Routes>
     </div>

@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { Container, Table, Button, Modal, Form } from "react-bootstrap";
 import { fetchUserDataByUserId, editTaskByTimesheetId, deleteTimesheetByTimesheetId, fetchAllActivities,fetchAllProjects } from "../../services/API";
+import { useLocation } from "react-router-dom";
 
-const TableData = ({userId}) => {
+const TableData = () => {
 
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const userId = searchParams.get("userId");
+
+  
   const [tasksData, setTasksData] = useState([
     {
       timeSheetId: null,
@@ -27,6 +33,7 @@ const TableData = ({userId}) => {
     userId: 0,
     activityId: 0,
   });
+  
   const today = new Date();
 
   const generateWeekDates = () => {
@@ -146,8 +153,8 @@ const TableData = ({userId}) => {
   };
 
   return (
-    <Container>
-      {<Table bordered>
+    <Container className="text-align-center">
+      <Table bordered>
         <thead>
           <tr>
             <th>Project Name</th>
@@ -196,7 +203,7 @@ const TableData = ({userId}) => {
             <td></td>
           </tr>
         </tbody>
-      </Table>}
+      </Table>
 
       {/* Edit Modal */}
       <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
